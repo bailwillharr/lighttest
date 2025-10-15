@@ -21,6 +21,9 @@
     <ClCompile Include="corsair_helpers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="set_colors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="corsair_helpers.h">
@@ -30,6 +33,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="static_vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fixed_update_loop.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="leds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="set_colors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

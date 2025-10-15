@@ -20,6 +20,9 @@ const char* corsairSessionStateToString(CorsairSessionState session_state);
 
 void corsairCheckError(CorsairError err, const char* function_name);
 
+// returns nullptr if keyboard not found
+const CorsairDeviceId* findKeyboard();
+
 template <>
 struct std::formatter<CorsairError> {
     constexpr auto parse(std::format_parse_context& ctx) const { return ctx.begin(); }

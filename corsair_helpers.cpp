@@ -1,5 +1,8 @@
 #include "corsair_helpers.h"
 
+#include "static_vector.h"
+#include "my_print.h"
+
 const char* corsairErrToString(CorsairError err)
 {
 	switch (err)
@@ -52,4 +55,29 @@ void corsairCheckError(CorsairError err, const char* function_name)
 	if (err != CE_Success) {
 		die("iCUESDK function {} returned {}", function_name, err);
 	}
+}
+
+const CorsairDeviceId* findKeyboard()
+{
+	static static_vector<CorsairDeviceInfo, CORSAIR_DEVICE_COUNT_MAX> s_found_devices;
+
+	const CorsairDeviceId* device_id{};
+	const CorsairDeviceFilter filter{ CDT_Keyboard };
+	int num_devices{};
+	CHECKCORSAIR(CorsairGetDevices(&filter, static_cast<int>(s_found_devices.capacity()), s_found_devices.data(), &num_devices));
+	myPrint("Found {} devices:", num_devices);
+	s_found_devices.resize_uninitialized(static_cast<uint32_t>(num_devices));
+	for (int i = 0; i < num_devices; ++i) {
+		const auto& dev = s_found_devices[i];
+		myPrint("[{}]:", i);
+		myPrint("    model: {}", dev.model);
+		myPrint("    serial: {}", dev.serial);
+		myPrint("    id: {}", dev.id);
+		myPrint("    LED count: {}", dev.ledCount);
+		myPrint("    channel count: {}", dev.channelCount);
+		if (i == 0) {
+			device_id = &dev.id;
+		}
+	}
+	return device_id;
 }
