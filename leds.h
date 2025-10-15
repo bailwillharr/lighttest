@@ -5,6 +5,7 @@
 #include "corsair_helpers.h"
 #include "static_vector.h"
 
+// Maps key indices to CorsairLedLuid values
 class Leds {
 	static_vector<CorsairLedPosition, CORSAIR_DEVICE_LEDCOUNT_MAX> m_led_positions{};
 

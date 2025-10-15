@@ -102,7 +102,7 @@ int main()
 	// Even then, at 20 Hz the timing isn't super consistent, some sets appear on time, some early, some late.
 	// But such inconsitencies can still be resolved with proper sampling.
 	// It's likely that the iCUE SDK internally updates the keyboard at 20Hz
-	constexpr double FREQUENCY = 20.0;
+	constexpr double FREQUENCY = 20.0; // cycles per second
 	constexpr int ITERS = 100;
 	myPrint("Flashing at {} Hz for {} sec", FREQUENCY, static_cast<double>(ITERS) / FREQUENCY);
 	startFixedUpdateLoop(ITERS, static_cast<int64_t>(1'000'000.0 / FREQUENCY), [&](int iteration) {
@@ -131,22 +131,15 @@ int main()
 		}
 		for (uint32_t i = 0; i < led_colors.size(); ++i) {
 			led_colors[i].id = leds.getLed(i);
-			if ((i + iteration) % 2 == 0) {
-				led_colors[i].r = color[0];
-				led_colors[i].g = color[1];
-				led_colors[i].b = color[2];
-				led_colors[i].a = 255;
-			}
-			else {
-				led_colors[i].r = 255;
-				led_colors[i].g = 255;
-				led_colors[i].b = 255;
-				led_colors[i].a = 255;
-			}
+			led_colors[i].r = color[0];
+			led_colors[i].g = color[1];
+			led_colors[i].b = color[2];
+			led_colors[i].a = 255;
 		}
 		waitForColors();
 		setColors(device_id, led_colors);
 		});
+	waitForColors();
 
 	auto end = std::chrono::high_resolution_clock::now();
 
