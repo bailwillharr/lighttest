@@ -4,6 +4,8 @@
 
 #include <iCUESDK/iCUESDK.h>
 
-void setColors(const CorsairDeviceId* device_id, std::span<const CorsairLedColor> led_colors);
+#include "leds.h"
+
+void setColors(const CorsairDeviceId* device_id, const Leds& leds);
 
 void waitForColors();

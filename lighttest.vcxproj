@@ -47,7 +47,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)iCUESDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -68,7 +68,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)iCUESDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -85,14 +85,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="corsair_helpers.cpp" />
+    <ClCompile Include="graph.cpp" />
+    <ClCompile Include="ideal_transmit.cpp" />
     <ClCompile Include="lighttest.cpp" />
+    <ClCompile Include="morse_code.cpp" />
+    <ClCompile Include="parallel_eight.cpp" />
     <ClCompile Include="set_colors.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="corsair_helpers.h" />
     <ClInclude Include="fixed_update_loop.h" />
+    <ClInclude Include="graph.h" />
+    <ClInclude Include="ideal_transmit.h" />
     <ClInclude Include="leds.h" />
+    <ClInclude Include="morse_code.h" />
     <ClInclude Include="my_print.h" />
+    <ClInclude Include="parallel_eight.h" />
     <ClInclude Include="set_colors.h" />
     <ClInclude Include="static_vector.h" />
   </ItemGroup>

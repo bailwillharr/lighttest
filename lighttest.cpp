@@ -1,19 +1,25 @@
 #include <cassert>
 
-#include <span>
-#include <iostream>
-#include <format>
+#include <array>
 #include <condition_variable>
+#include <format>
+#include <iostream>
 #include <mutex>
+#include <span>
+
+#include <Windows.h>
+#include <Lmcons.h>
 
 #include <iCUESDK/iCUESDK.h>
 
 #include "corsair_helpers.h"
+#include "leds.h"
+#include "morse_code.h"
+#include "parallel_eight.h"
 #include "my_print.h"
 #include "static_vector.h"
-#include "fixed_update_loop.h"
-#include "leds.h"
-#include "set_colors.h"
+#include "graph.h"
+#include "ideal_transmit.h"
 
 struct StateChangedContext {
 	std::mutex mutex{}; // accessed by main thread and onStateChanged thread
@@ -64,6 +70,19 @@ static void onStateChanged(void* context, const CorsairSessionStateChanged* even
 	}
 }
 
+// from ChatGPT
+static std::string TCharToAscii(const TCHAR* tstr)
+{
+#ifdef UNICODE
+	int len = WideCharToMultiByte(CP_ACP, 0, tstr, -1, nullptr, 0, nullptr, nullptr);
+	std::string result(len - 1, '\0');
+	WideCharToMultiByte(CP_ACP, 0, tstr, -1, &result[0], len, nullptr, nullptr);
+	return result;
+#else
+	return std::string(tstr);
+#endif
+}
+
 int main()
 {
 
@@ -88,67 +107,22 @@ int main()
 	// Request exclusive control over the keyboard's lighting and key events
 	CHECKCORSAIR(CorsairRequestControl(*device_id, CAL_ExclusiveLightingControlAndKeyEventsListening));
 
-	static const Leds leds(device_id);
+	static Leds leds(device_id);
 
 	/////////
 	// RUN //
 	/////////
 
-	static_vector<CorsairLedColor, CORSAIR_DEVICE_LEDCOUNT_MAX> led_colors(leds.getCount(), CorsairLedColor{ .r = 0, .g = 0, .b = 0, .a = 255 });
-
-	auto start = std::chrono::high_resolution_clock::now();
-
-	// 20 Hz is the absolute maximum possible frequency. Any higher and some LED sets are skipped
-	// Even then, at 20 Hz the timing isn't super consistent, some sets appear on time, some early, some late.
-	// But such inconsitencies can still be resolved with proper sampling.
-	// It's likely that the iCUE SDK internally updates the keyboard at 20Hz
-	constexpr double FREQUENCY = 20.0; // cycles per second
-	constexpr int ITERS = 100;
-	myPrint("Flashing at {} Hz for {} sec", FREQUENCY, static_cast<double>(ITERS) / FREQUENCY);
-	startFixedUpdateLoop(ITERS, static_cast<int64_t>(1'000'000.0 / FREQUENCY), [&](int iteration) {
-		// This code runs 20 times per second
-		uint8_t color[3]{};
-		switch (iteration % 4) {
-		case 0:
-			color[0] = 255;
-			color[1] = 0;
-			color[2] = 0;
-			break;
-		case 1:
-			color[0] = 0;
-			color[1] = 255;
-			color[2] = 0;
-			break;
-		case 2:
-			color[0] = 0;
-			color[1] = 0;
-			color[2] = 255;
-			break;
-		case 3:
-			color[0] = 0;
-			color[1] = 0;
-			color[2] = 0;
-		}
-		for (uint32_t i = 0; i < led_colors.size(); ++i) {
-			led_colors[i].id = leds.getLed(i);
-			led_colors[i].r = color[0];
-			led_colors[i].g = color[1];
-			led_colors[i].b = color[2];
-			led_colors[i].a = 255;
-		}
-		waitForColors();
-		setColors(device_id, led_colors);
-		});
-	waitForColors();
-
-	auto end = std::chrono::high_resolution_clock::now();
-
-	myPrint("Took: {} ms", std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count() / 1'000'000LL);
+	//transmitMorseCode(device_id, leds, user_name_ascii);
+	//transmitMorseCode(device_id, leds, "YOU GOT HACKED");
+	//transmitParallelEight(device_id, leds, {});
+	//liveGraph(device_id, leds);
+	idealTransmit(device_id, leds);
 
 	/////////////
 	// CLEANUP //
 	/////////////
 
-	CHECKCORSAIR(CorsairReleaseControl(nullptr));
+	CHECKCORSAIR(CorsairReleaseControl(*device_id));
 	CHECKCORSAIR(CorsairDisconnect());
 }

@@ -17,11 +17,11 @@ static void onColorSet(void*, CorsairError error)
 	s_color_set.store(true, std::memory_order_relaxed);
 }
 
-void setColors(const CorsairDeviceId* device_id, std::span<const CorsairLedColor> led_colors)
+void setColors(const CorsairDeviceId* device_id, const Leds& leds)
 {
 	assert(s_color_set.load(std::memory_order_relaxed) == true);
 	s_color_set.store(false, std::memory_order_relaxed);
-	CHECKCORSAIR(CorsairSetLedColorsBuffer(*device_id, static_cast<int>(led_colors.size()), led_colors.data()));
+	CHECKCORSAIR(CorsairSetLedColorsBuffer(*device_id, static_cast<int>(leds.getCount()), leds.getColorsBuffer()));
 	CHECKCORSAIR(CorsairSetLedColorsFlushBufferAsync(onColorSet, nullptr));
 
 }
