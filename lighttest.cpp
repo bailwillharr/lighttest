@@ -19,7 +19,9 @@
 #include "my_print.h"
 #include "static_vector.h"
 #include "graph.h"
-#include "ideal_transmit.h"
+#include "calibration.h"
+#include "sampling_test.h"
+#include "transmit_image.h"
 
 struct StateChangedContext {
 	std::mutex mutex{}; // accessed by main thread and onStateChanged thread
@@ -70,19 +72,6 @@ static void onStateChanged(void* context, const CorsairSessionStateChanged* even
 	}
 }
 
-// from ChatGPT
-static std::string TCharToAscii(const TCHAR* tstr)
-{
-#ifdef UNICODE
-	int len = WideCharToMultiByte(CP_ACP, 0, tstr, -1, nullptr, 0, nullptr, nullptr);
-	std::string result(len - 1, '\0');
-	WideCharToMultiByte(CP_ACP, 0, tstr, -1, &result[0], len, nullptr, nullptr);
-	return result;
-#else
-	return std::string(tstr);
-#endif
-}
-
 int main()
 {
 
@@ -117,7 +106,9 @@ int main()
 	//transmitMorseCode(device_id, leds, "YOU GOT HACKED");
 	//transmitParallelEight(device_id, leds, {});
 	//liveGraph(device_id, leds);
-	idealTransmit(device_id, leds);
+	//idealTransmit(device_id, leds);
+	//samplingTest(device_id, leds, 10.0, 1000);
+	transmitImage(device_id, leds, std::filesystem::path(PROJECT_DIR) / "images" / "juno128.png", 64);
 
 	/////////////
 	// CLEANUP //

@@ -1,4 +1,4 @@
-#include "graph.h"
+#include "calibration.h"
 
 #include <cmath>
 
@@ -32,16 +32,16 @@ static Color getColor(uint32_t i)
 	i /= 8;
 	uint8_t r3 = i % 8;
 
-	c.r = (r3 * 255 + 3) / 7;
+	c.r = (r3 * 255 + 3) / 7; 
 	c.g = (g3 * 255 + 3) / 7;
 	c.b = (b3 * 255 + 3) / 7;
 
 	return c;
 }
 
-void idealTransmit(const CorsairDeviceId* device_id, Leds& leds)
+void calibrationTransmit(const CorsairDeviceId* device_id, Leds& leds)
 {
-	constexpr double FREQUENCY = 20.0; // cycles per second
+	constexpr double FREQUENCY = 10.0; // cycles per second
 	auto iters = 512;
 
 	myPrint("Transmitting at {} Hz for {} sec", FREQUENCY, static_cast<double>(iters) / FREQUENCY);
@@ -56,4 +56,8 @@ void idealTransmit(const CorsairDeviceId* device_id, Leds& leds)
 		setColors(device_id, leds);
 		});
 	waitForColors();
+	leds.setAll(255, 0, 0);
+	setColors(device_id, leds);
+	waitForColors();
+	std::this_thread::sleep_for(std::chrono::seconds(1));
 }

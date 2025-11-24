@@ -33,7 +33,13 @@
     <ClCompile Include="graph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ideal_transmit.cpp">
+    <ClCompile Include="calibration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sampling_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="transmit_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,7 +71,13 @@
     <ClInclude Include="graph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ideal_transmit.h">
+    <ClInclude Include="calibration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sampling_test.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="transmit_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

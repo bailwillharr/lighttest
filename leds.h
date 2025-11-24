@@ -9,6 +9,14 @@
 #include "corsair_helpers.h"
 #include "static_vector.h"
 
+/*
+
+65 is mute led
+last 2 are corsair logo
+ignore these for now
+
+*/
+
 struct LedBounds {
 	float min_x_pos{ std::numeric_limits<float>::max() };
 	float max_x_pos{ std::numeric_limits<float>::min() };
