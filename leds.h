@@ -14,6 +14,7 @@
 65 is mute led
 last 2 are corsair logo
 ignore these for now
+this leaves 109 keys
 
 */
 
