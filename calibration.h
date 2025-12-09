@@ -5,3 +5,5 @@
 #include "leds.h"
 
 void calibrationTransmit(const CorsairDeviceId* device_id, Leds& leds);
+
+void calibrationTransmitForText(const CorsairDeviceId* device_id, Leds& leds);

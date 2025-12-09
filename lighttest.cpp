@@ -6,6 +6,7 @@
 #include <iostream>
 #include <mutex>
 #include <span>
+#include <fstream>
 
 #include <Windows.h>
 #include <Lmcons.h>
@@ -110,9 +111,33 @@ int main()
 	//liveGraph(device_id, leds);
 	//idealTransmit(device_id, leds);
 	//samplingTest(device_id, leds, 10.0, 1000);
-	transmitImage(device_id, leds, std::filesystem::path(PROJECT_DIR) / "images" / "mandrill.png");
+	//transmitImage(device_id, leds, std::filesystem::path(PROJECT_DIR) / "images" / "mandrill.png");
 	//calibrationTransmit(device_id, leds);
 
+	calibrationTransmitForText(device_id, leds);
+
+	std::vector<char> text_data_vec;
+	{
+		std::ifstream file(std::filesystem::path(PROJECT_DIR) / "text" / "lipsum.txt", std::ios::binary);
+		if (!file) {
+			std::cerr << "Failed to open file\n";
+			return 1;
+		}
+
+		// Seek to the end to determine file size
+		file.seekg(0, std::ios::end);
+		std::streamsize size = file.tellg();
+		file.seekg(0, std::ios::beg);
+
+		text_data_vec.resize(size);
+		// Resize vector and read the file
+		if (!file.read(text_data_vec.data(), size)) {
+			std::cerr << "Error reading file\n";
+			return 1;
+		}
+	}
+
+	transmitText(device_id, leds, text_data_vec);
 #if 0
 	for (int i = 0; i < leds.getCount(); ++i) {
 		auto pos = leds.getAllLedPositions()[i];

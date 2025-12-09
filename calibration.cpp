@@ -39,6 +39,28 @@ static Color getColor(uint32_t i)
 	return c;
 }
 
+static Color getColor128(int i)
+{
+	Color c{};
+
+	// 128 colors
+	// 2 bits for R
+	// 3 bits for G
+	// 2 bits for B
+
+	int b2 = i % 4;
+	i /= 4;
+	int g3 = i % 8;
+	i /= 8;
+	int r2 = i % 4;
+
+	c.r = (r2 * 255) / 3;
+	c.g = (g3 * 255) / 7;
+	c.b = (b2 * 255) / 3;
+
+	return c;
+}
+
 void calibrationTransmit(const CorsairDeviceId* device_id, Leds& leds)
 {
 	constexpr double FREQUENCY = 10.0; // cycles per second
@@ -57,6 +79,32 @@ void calibrationTransmit(const CorsairDeviceId* device_id, Leds& leds)
 		});
 	waitForColors();
 	leds.setAll(255, 0, 0);
+	setColors(device_id, leds);
+	waitForColors();
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+}
+
+void calibrationTransmitForText(const CorsairDeviceId* device_id, Leds& leds)
+{
+	constexpr double FREQUENCY = 5.0; // cycles per second
+	auto iters = 8;
+
+	myPrint("Transmitting at {} Hz for {} sec", FREQUENCY, static_cast<double>(iters) / FREQUENCY);
+
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+
+	auto start = std::chrono::high_resolution_clock::now();
+	startFixedUpdateLoop(iters, static_cast<int64_t>(1'000'000.0 / FREQUENCY), [&](int iteration) {
+		Color c{};
+		c.r = ((iteration >> 0) & 1) * 255;
+		c.g = ((iteration >> 1) & 1) * 255;
+		c.b = ((iteration >> 2) & 1) * 255;
+		leds.setAll(c.r, c.g, c.b);
+		waitForColors();
+		setColors(device_id, leds);
+		});
+	waitForColors();
+	//leds.setAll(255, 0, 0);
 	setColors(device_id, leds);
 	waitForColors();
 	std::this_thread::sleep_for(std::chrono::seconds(1));
