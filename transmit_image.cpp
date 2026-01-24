@@ -174,7 +174,7 @@ void transmitText(const CorsairDeviceId* device_id, Leds& leds, std::vector<char
 		});
 
 	// generate LUT to get keys in order
-	std::map<int, std::vector<int>> rows{};
+	std::array<std::vector<int>, 6> rows{};
 	for (int i = 0; i < leds.getCount(); ++i) {
 		auto pos = leds.getAllLedPositions()[i];
 		if (pos.cy < 34.3) {
@@ -183,26 +183,33 @@ void transmitText(const CorsairDeviceId* device_id, Leds& leds, std::vector<char
 		}
 		if (pos.cy > 34.3 && pos.cy <= 38.6) {
 			rows[0].push_back(i);
+			continue;
 		}
 		if (pos.cy > 38.6 && pos.cy <= 59.5) {
 			rows[1].push_back(i);
+			continue;
 		}
 		if (pos.cy > 59.5 && pos.cy <= 78.5) {
 			rows[2].push_back(i);
+			continue;
 		}
 		if (pos.cy > 78.5 && pos.cy <= 97.6) {
 			rows[3].push_back(i);
+			continue;
 		}
 		if (pos.cy > 97.6 && pos.cy <= 116.1) {
 			rows[4].push_back(i);
+			continue;
 		}
 		if (pos.cy > 116.1 && pos.cy <= 135.6) {
 			rows[5].push_back(i);
+			continue;
 		}
+		throw std::runtime_error("Key didn't match?");
 	}
 
-	for (auto& [i, row] : rows) {
-		std::sort(row.begin(), row.end(), [&](int first, int second) ->bool {
+	for (int i = 0; i < rows.size(); ++i) {
+		std::sort(rows[i].begin(), rows[i].end(), [&](int first, int second) ->bool {
 			// returns true if first is less than second
 			double x1 = leds.getAllLedPositions()[first].cx;
 			double x2 = leds.getAllLedPositions()[second].cx;
@@ -210,143 +217,120 @@ void transmitText(const CorsairDeviceId* device_id, Leds& leds, std::vector<char
 			});
 	}
 
-	std::vector<int> ordered{};
-
-	for (const auto& [i, row] : rows) {
-		for (int i : row) {
-			ordered.push_back(i);
+	std::array<std::vector<int>, 8> sections{};
+	// top left going right, then bottom left going right
+	// section 0
+	for (int index = 0; index < rows[0].size(); ++index) {
+		if (index < 5) {
+			sections[0].push_back(rows[0][index]);
+			continue;
 		}
+		if (index < 13) {
+			sections[1].push_back(rows[0][index]);
+			continue;
+		}
+		if (index < 16) {
+			sections[2].push_back(rows[0][index]);
+			continue;
+		}
+		sections[3].push_back(rows[0][index]);
 	}
 
-	assert(ordered.size() == 109);
+	for (int index = 0; index < rows[1].size(); ++index) {
+		if (index < 6) {
+			sections[0].push_back(rows[1][index]);
+			continue;
+		}
+		if (index < 14) {
+			sections[1].push_back(rows[1][index]);
+			continue;
+		}
+		if (index < 17) {
+			sections[2].push_back(rows[1][index]);
+			continue;
+		}
+		sections[3].push_back(rows[1][index]);
+	}
 
-	std::array<std::vector<int>, 8> sections{};
-	sections[0] = {
-		91,
-		93,
-		92,
-		88,
-		87,
-		79,
-		82,
-		81,
-		107,
-		106,
-		109,
-		98,
-		101,
-		100,
-		95,
-		94,
-		97,
-	};
-	sections[1] = {
-		90,
-		89,
-		84,
-		83,
-		86,
-		85,
-		80,
-		28,
-		108,
-		103,
-		102,
-		105,
-		104,
-		99,
-		43,
-		39,
-		96,
-		60,
-		59,
-		62,
-		61,
-		56,
-		44,
-		42,
-	};
-	sections[2] = {
-		29,
-		25,
-		24,
-		27,
-		26,
-		45,
-		38,
-		41,
-		40,
-	};
-	sections[3] = {
-		8,
-		7,
-		10,
-		9,
-		4,
-		3,
-		6,
-		5,
-		1,
-		22,
-		21,
-		0,
-	};
-	sections[4] = {
-		55,
-		58,
-		57,
-		52,
-		51,
-		54,
-		75,
-		78,
-		77,
-		72,
-		71,
-		74,
-		63,
-		66,
-		65,
-		33,
-	};
-	sections[5] = {
-		53,
-		48,
-		47,
-		50,
-		49,
-		76,
-		46,
-		73,
-		68,
-		67,
-		70,
-		69,
-		64,
-		35,
-		31,
-		30,
-		32,
-		34,
-	};
-	sections[6] = {
-		37,
-		36,
-		12,
-		11,
-	};
-	sections[7] = {
-		23,
-		18,
-		17,
-		20,
-		19,
-		15,
-		14,
-		16,
-		2,
-	};
+	for (int index = 0; index < rows[2].size(); ++index) {
+		if (index < 6) {
+			sections[0].push_back(rows[2][index]);
+			continue;
+		}
+		if (index < 13) {
+			sections[1].push_back(rows[2][index]);
+			continue;
+		}
+		if (index < 16) {
+			sections[2].push_back(rows[2][index]);
+			continue;
+		}
+		sections[3].push_back(rows[2][index]);
+	}
 
+	for (int index = 0; index < rows[3].size(); ++index) {
+		if (index < 6) {
+			sections[4].push_back(rows[3][index]);
+			continue;
+		}
+		if (index < 13) {
+			sections[5].push_back(rows[3][index]);
+			continue;
+		}
+		if (index == 13) {
+			// big enter key
+			sections[1].push_back(rows[3][index]);
+			continue;
+		}
+		if (index == 17) {
+			// numpad plus
+			sections[3].push_back(rows[3][index]);
+			continue;
+		}
+		sections[7].push_back(rows[3][index]);
+	}
+
+	for (int index = 0; index < rows[4].size(); ++index) {
+		if (index < 6) {
+			sections[4].push_back(rows[4][index]);
+			continue;
+		}
+		if (index < 13) {
+			sections[5].push_back(rows[4][index]);
+			continue;
+		}
+		if (index < 14) {
+			sections[6].push_back(rows[4][index]);
+			continue;
+		}
+		sections[7].push_back(rows[4][index]);
+	}
+	for (int index = 0; index < rows[5].size(); ++index) {
+		if (index < 4) {
+			sections[4].push_back(rows[5][index]);
+			continue;
+		}
+		if (index < 8) {
+			sections[5].push_back(rows[5][index]);
+			continue;
+		}
+		if (index < 11) {
+			sections[6].push_back(rows[5][index]);
+			continue;
+		}
+		sections[7].push_back(rows[5][index]);
+	}
+
+	assert(sections[0].size() == 17);
+	assert(sections[1].size() == 24);
+	assert(sections[2].size() == 9);
+	assert(sections[3].size() == 12);
+	assert(sections[4].size() == 16);
+	assert(sections[5].size() == 18);
+	assert(sections[6].size() == 4);
+	assert(sections[7].size() == 9);
+
+#if 0
 	{
 		int section_index = 0;
 		for (const auto& section : sections) {
@@ -365,12 +349,13 @@ void transmitText(const CorsairDeviceId* device_id, Leds& leds, std::vector<char
 			++section_index;
 		}
 	}
+#endif
 
 	leds.setAll(0, 255, 0);
 	setColors(device_id, leds);
 	waitForColors();
 
-	const double frequency = 10.0;
+	const double frequency = 20.0;
 	const int iters = static_cast<int>(std::ceil(static_cast<double>(text.size()) / 3.0));
 
 	text.resize(iters * 3);
