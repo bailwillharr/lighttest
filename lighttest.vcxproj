@@ -84,7 +84,9 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="bitrate_test.cpp" />
     <ClCompile Include="corsair_helpers.cpp" />
+    <ClCompile Include="crosstalk.cpp" />
     <ClCompile Include="graph.cpp" />
     <ClCompile Include="calibration.cpp" />
     <ClCompile Include="lighttest.cpp" />
@@ -95,7 +97,9 @@
     <ClCompile Include="transmit_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bitrate_test.h" />
     <ClInclude Include="corsair_helpers.h" />
+    <ClInclude Include="crosstalk.h" />
     <ClInclude Include="fixed_update_loop.h" />
     <ClInclude Include="graph.h" />
     <ClInclude Include="calibration.h" />

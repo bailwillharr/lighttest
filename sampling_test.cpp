@@ -15,21 +15,15 @@ void samplingTest(const CorsairDeviceId* device_id, Leds& leds, double frequency
 
 	myPrint("Transmitting at {} Hz for {} sec", frequency, static_cast<double>(iterations) / frequency);
 
-	leds.setAll(0, 255, 0);
-	setColors(device_id, leds);
+	auto start = std::chrono::high_resolution_clock::now();
+
 	waitForColors();
 
-	std::this_thread::sleep_for(std::chrono::seconds(1));
-
-	auto start = std::chrono::high_resolution_clock::now();
 	startFixedUpdateLoop(iterations, static_cast<int64_t>(1'000'000.0 / frequency), [&](int iteration) {
-		leds.setAll((iteration % 2) * 255, 0, 0);
+		leds.setAll(0, (iteration % 2) * 255, 0);
 		waitForColors();
 		setColors(device_id, leds);
 		});
+
 	waitForColors();
-	leds.setAll(0, 0, 255);
-	setColors(device_id, leds);
-	waitForColors();
-	std::this_thread::sleep_for(std::chrono::seconds(1));
 }

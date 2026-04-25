@@ -75,7 +75,7 @@ const CorsairDeviceId* findKeyboard()
 		myPrint("    id: {}", dev.id);
 		myPrint("    LED count: {}", dev.ledCount);
 		myPrint("    channel count: {}", dev.channelCount);
-		if (i == 0) {
+		if (dev.ledCount == 112) { // probably the right keyboard, K70
 			device_id = &dev.id;
 		}
 	}

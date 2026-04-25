@@ -6,6 +6,8 @@
 #include <numbers>
 #include <thread>
 
+#include <conio.h>
+
 #include "fixed_update_loop.h"
 #include "set_colors.h"
 #include "my_print.h"
@@ -23,16 +25,16 @@ struct Color {
 static Color getColor(uint32_t i)
 {
 	Color c{};
-	
+
 	// 8 permutations per channel for a total of 512 colours
-	
+
 	uint8_t b3 = i % 8;
 	i /= 8;
 	uint8_t g3 = i % 8;
 	i /= 8;
 	uint8_t r3 = i % 8;
 
-	c.r = (r3 * 255 + 3) / 7; 
+	c.r = (r3 * 255 + 3) / 7;
 	c.g = (g3 * 255 + 3) / 7;
 	c.b = (b3 * 255 + 3) / 7;
 
@@ -63,25 +65,30 @@ static Color getColor128(int i)
 
 void calibrationTransmit(const CorsairDeviceId* device_id, Leds& leds)
 {
-	constexpr double FREQUENCY = 10.0; // cycles per second
+	constexpr double FREQUENCY = 1.0; // cycles per second
 	auto iters = 512;
 
 	myPrint("Transmitting at {} Hz for {} sec", FREQUENCY, static_cast<double>(iters) / FREQUENCY);
 
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 
-	auto start = std::chrono::high_resolution_clock::now();
-	startFixedUpdateLoop(iters, static_cast<int64_t>(1'000'000.0 / FREQUENCY), [&](int iteration) {
-		Color c = getColor(iteration);
-		leds.setAll(c.r, c.g, c.b);
+	for (int awd = 0; awd < 4; ++awd) {
+
+		(void)_getch();
+
+		auto start = std::chrono::high_resolution_clock::now();
+		startFixedUpdateLoop(128, static_cast<int64_t>(1'000'000.0 / FREQUENCY), [&](int iteration) {
+			Color c = getColor((128 * awd) + iteration);
+			leds.setAll(c.r, c.g, c.b);
+			waitForColors();
+			setColors(device_id, leds);
+			});
 		waitForColors();
+		leds.setAll(255, 0, 0);
 		setColors(device_id, leds);
-		});
-	waitForColors();
-	leds.setAll(255, 0, 0);
-	setColors(device_id, leds);
-	waitForColors();
-	std::this_thread::sleep_for(std::chrono::seconds(1));
+		waitForColors();
+
+	}
 }
 
 void calibrationTransmitForText(const CorsairDeviceId* device_id, Leds& leds)

@@ -7,6 +7,8 @@
 #include <map>
 #include <bit>
 
+#include <conio.h>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -43,14 +45,8 @@ static Bitmap readImage(const std::filesystem::path& path)
 	return output;
 }
 
-void transmitImage(const CorsairDeviceId* device_id, Leds& leds, const std::filesystem::path& path)
+static auto getOrdered105(const Leds& leds)
 {
-	auto bitmap = readImage(path);
-	if (bitmap.data.empty()) {
-		myPrint("Failed to open image: {}", path.string());
-		abort();
-	}
-
 	// generate LUT to get keys in order
 	std::map<int, std::vector<int>> rows{};
 	for (int i = 0; i < leds.getCount(); ++i) {
@@ -88,18 +84,11 @@ void transmitImage(const CorsairDeviceId* device_id, Leds& leds, const std::file
 			});
 	}
 
-	leds.setAll(0, 255, 0);
-	setColors(device_id, leds);
-	waitForColors();
-
-	const double frequency = 10.0;
-	const int iters = static_cast<int>(ceil(static_cast<double>(bitmap.width * bitmap.height) / 109.0));
-
-	// hack to avoid OOB read
-	bitmap.data.resize(iters * 109 * 4);
-
-	myPrint("LED count: {}", leds.getCount());
-
+	// remove multimedia keys
+	rows[0].pop_back();
+	rows[0].pop_back();
+	rows[0].pop_back();
+	rows[0].pop_back();
 
 	std::vector<int> ordered{};
 
@@ -109,18 +98,45 @@ void transmitImage(const CorsairDeviceId* device_id, Leds& leds, const std::file
 		}
 	}
 
-	assert(ordered.size() == 109);
+	assert(ordered.size() == 105);
+
+	return ordered;
+}
+
+void transmitImage(const CorsairDeviceId* device_id, Leds& leds, const std::filesystem::path& path)
+{
+	auto bitmap = readImage(path);
+	if (bitmap.data.empty()) {
+		myPrint("Failed to open image: {}", path.string());
+		abort();
+	}
+
+	auto ordered = getOrdered105(leds);
+
+	leds.setAll(0, 255, 0);
+	setColors(device_id, leds);
+	waitForColors();
+
+	const double frequency = 5.0;
+	const int iters = static_cast<int>(ceil(static_cast<double>(bitmap.width * bitmap.height) / 105.0));
+
+	// hack to avoid OOB read
+	bitmap.data.resize(iters * 105 * 4);
+
+	myPrint("LED count: {}", leds.getCount());
 
 	myPrint("Transmitting for {} seconds", static_cast<double>(iters) / frequency);
 
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 
+	_getch();
+
 	startFixedUpdateLoop(iters, static_cast<int64_t>(1'000'000.0 / frequency), [&](int iteration) {
 		leds.setAll(0, 0, 0);
-		for (int i = 0; i < 109; ++i) {
-			uint8_t r = bitmap.data[(iteration * 109 + i) * 4 + 0];
-			uint8_t g = bitmap.data[(iteration * 109 + i) * 4 + 1];
-			uint8_t b = bitmap.data[(iteration * 109 + i) * 4 + 2];
+		for (int i = 0; i < 105; ++i) {
+			uint8_t r = bitmap.data[(iteration * 105 + i) * 4 + 0];
+			uint8_t g = bitmap.data[(iteration * 105 + i) * 4 + 1];
+			uint8_t b = bitmap.data[(iteration * 105 + i) * 4 + 2];
 			leds.setLed(ordered[i], r, g, b);
 		}
 		waitForColors();

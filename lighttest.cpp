@@ -25,6 +25,8 @@
 #include "transmit_image.h"
 #include "fixed_update_loop.h"
 #include "set_colors.h"
+#include "bitrate_test.h"
+#include "crosstalk.h"
 
 struct StateChangedContext {
 	std::mutex mutex{}; // accessed by main thread and onStateChanged thread
@@ -111,13 +113,12 @@ int main()
 	//liveGraph(device_id, leds);
 	//idealTransmit(device_id, leds);
 	//samplingTest(device_id, leds, 10.0, 1000);
-	//transmitImage(device_id, leds, std::filesystem::path(PROJECT_DIR) / "images" / "mandrill128.png");
+	//transmitImage(device_id, leds, std::filesystem::path(PROJECT_DIR) / "images" / "woman128x174.png");
 	//calibrationTransmit(device_id, leds);
 
-	calibrationTransmitForText(device_id, leds);
+	//calibrationTransmitForText(device_id, leds);
 
-	abort();
-
+	/*
 	std::vector<char> text_data_vec;
 	{
 		std::ifstream file(std::filesystem::path(PROJECT_DIR) / "text" / "lipsum.txt", std::ios::binary);
@@ -138,20 +139,30 @@ int main()
 			return 1;
 		}
 	}
+	*/
 
-	transmitText(device_id, leds, text_data_vec);
-#if 0
-	for (int i = 0; i < leds.getCount(); ++i) {
-		auto pos = leds.getAllLedPositions()[i];
-		myPrint("index: {}, x: {}, y; {}", i, pos.cx, pos.cy);
-		waitForColors();
-		leds.setAll(0, 0, 0);
-		leds.setLed(i, 255, 0, 0);
-		setColors(device_id, leds);
-		std::string dummy;
-		std::getline(std::cin, dummy);   // waits for Enter
-	}
-#endif
+
+
+	//transmitText(device_id, leds, text_data_vec);
+//#if 0
+//	for (int i = 0; i < leds.getCount(); ++i) {
+//		auto pos = leds.getAllLedPositions()[i];
+//		myPrint("index: {}, x: {}, y; {}", i, pos.cx, pos.cy);
+//		waitForColors();
+//		leds.setAll(0, 0, 0);
+//		leds.setLed(i, 255, 0, 0);
+//		setColors(device_id, leds);
+//		std::string dummy;
+//		std::getline(std::cin, dummy);   // waits for Enter
+//	}
+//#endif
+
+	//bitrateTest(device_id, leds);
+	//bitrateTestFreqSweep(device_id, leds);
+	//bitrateTestCellSize(device_id, leds);
+	//bitrateTestColors(device_id, leds);
+
+	crosstalkTransmit(device_id, leds);
 
 	/////////////
 	// CLEANUP //
